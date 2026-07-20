@@ -1,4 +1,4 @@
-public interface IController: IBelongToAchitecture
+public interface IController: IBelongToAchitecture,ICanSetArchitecture,ICanSendCommand,ICanGetModel, ICanGetSystem,ICanRegisterEvent
 {
 
 }

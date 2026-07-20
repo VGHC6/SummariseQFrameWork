@@ -8,9 +8,13 @@ public interface IAchitecture
     T GetUtility<T>() where T : class, IUtility;
     void RegisterUtility<T>(T instance) where T : IUtility;
 
+
+
     //数据层接口
     T GetModel<T>() where T : class, IModel;
     void RegisterModel<T>(T instance) where T : IModel;
+
+
 
     //系统层接口
     T GetSystem<T>() where T : class, ISystem;
@@ -21,6 +25,14 @@ public interface IAchitecture
     //命令接口
     void SendCommand<T>() where T : ICommand, new();//发送命令
     void SendCommand<T>(T command) where T : ICommand;//发送命令带参
+
+
+
+    //事件接口
+    void SendEvent<T>() where T : new();//发送事件
+    void SendEvent<T>(T e);
+    IUnRegister RegisterEvent<T>(Action<T> OnEvent);//注册事件
+    void UnRegisterEvent<T>(Action<T> OnEvent);//取消注册事件
 }
 
 public abstract class Architecture<T> : IAchitecture where T : Architecture<T>, new()//子类把自己的类型作为泛型参数传给父类,泛型 T 必须是 Architecture<T> 的子类
@@ -166,5 +178,33 @@ public abstract class Architecture<T> : IAchitecture where T : Architecture<T>, 
     {
         command.SetArchitecture(this);
         command.Excute();
+    }
+
+
+
+    /// <summary>
+    /// 事件接口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <exception></exception>
+    public ITypeEventSystem _typeEventSystem = new TypeEventSystem<T>();
+    public void SendEvent<T>() where T : new()
+    {
+        _typeEventSystem.Send<T>();
+    }
+
+    public void SendEvent<T>(T e)
+    {
+        _typeEventSystem.Send<T>(e);
+    }
+
+    public IUnRegister RegisterEvent<T>(Action<T> OnEvent)
+    {
+        return _typeEventSystem.Register<T>(OnEvent);
+    }
+
+    public void UnRegisterEvent<T>(Action<T> OnEvent)
+    {
+        _typeEventSystem.UnRegister<T>(OnEvent);
     }
 }
